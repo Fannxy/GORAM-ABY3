@@ -1,0 +1,3 @@
+[submodule "aby3"]
+	path = aby3
+	url = git@github.com:Fannxy/aby3.git
