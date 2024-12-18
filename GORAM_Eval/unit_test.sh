@@ -47,7 +47,7 @@ for pfile in ./party-*.txt; do
 done
 cd ../;
 
-test_args=" -Shuffle -ORAM -Graph -GraphQuery"
+test_args=" -Shuffle -ORAM -Graph -GraphQuery -Sort"
 cd ./aby3;
 ./Eval/dis_exec.sh "${test_args}"
 wait;

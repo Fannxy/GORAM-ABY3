@@ -1,12 +1,22 @@
 #!/bin/bash
 
 # install the dependencies
-apt-get install -y software-properties-common
-add-apt-repository ppa:george-edison55/cmake-3.x
-apt-get update
-apt-get install -y cmake=3.18.5-0kitware1
+cmake_version=$(cmake --version 2>/dev/null | grep "cmake version 3.18.5")
 
-apt-get install -y mpich=3.2-2
+if [ -z "$cmake_version" ]; then
+    echo "Installing cmake 3.18.5..."
+    wget https://github.com/Kitware/CMake/releases/download/v3.18.5/cmake-3.18.5.tar.gz
+    tar -zxvf cmake-3.18.5.tar.gz
+    cd cmake-3.18.5
+    ./bootstrap
+    make
+    sudo make install
+    cd ..
+    rm -rf cmake-3.18.5
+    rm cmake-3.18.5.tar.gz
+else
+    echo "cmake 3.18.5 is already installed."
+fi
 
 pip install -r ./aby3/requirements.txt
 
