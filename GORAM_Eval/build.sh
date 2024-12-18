@@ -23,9 +23,14 @@ pip install -r ./aby3/requirements.txt
 # build ABY3
 python ./aby3/build.py --setup
 
+# save the folder
+pushd .
+
 cd ./aby3/thirdparty/libOTe/out/macoro;
 git checkout cfd155c11bd52c000c0c1afd6f03ed247c49610e; 
-cd ../../../../..
+
+# turn to the origional folder
+popd
 
 # fix the bug in the thirdparty library.
 FILE_PATH="./aby3/thirdparty/libOTe/cryptoTools/cryptoTools/Circuit/BetaLibrary.cpp"
