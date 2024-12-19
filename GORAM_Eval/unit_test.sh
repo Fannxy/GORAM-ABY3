@@ -41,13 +41,18 @@ echo "Current path: ${debugFile}"
 cd ./aby3/;
 python ./build.py --DEBUG_FILE ${debugFile} --GRAPH_FOLDER ${graphFolder}
 
+# data sync.
+echo "Graph folder = "${graphFolder}
+scp -r ${current_path}/aby3/aby3-GORAM/data aby31:${current_path}/aby3/aby3-GORAM/data
+scp -r ${current_path}/aby3/aby3-GORAM/data aby32:${current_path}/aby3/aby3-GORAM/data
+
 # clean debugging files party-*.txt if exist.
 for pfile in ./party-*.txt; do
     rm ${pfile};
 done
 cd ../;
 
-test_args=" -Shuffle -ORAM -Graph -GraphQuery -Sort"
+test_args=" -Shuffle -ORAM -Sort -Graph -GraphQuery"
 cd ./aby3;
 ./Eval/dis_exec.sh "${test_args}"
 wait;

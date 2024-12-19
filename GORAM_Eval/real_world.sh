@@ -62,14 +62,14 @@ cd ../;
 # large scale, requiring >3 * 400GB RAM, therefore we do not provide a full version here, the following code is for reference only.
 echo -e "\e[32mTwitter (it will take a long time...), therefore we comment out the corresponding scripts\e[0m"
 
-# if [ -f "$real_world_folder/twitter-2010.txt" ]; then
-#     echo "File $real_world_folder/twitter-2010.txt already exists."
-# else
-#     download_and_extract https://snap.stanford.edu/data/twitter-2010.txt.gz $real_world_folder/
-# fi
-# python ./aby3-GORAM/privGraphQuery/preprocessing.py --target twitter
+if [ -f "$real_world_folder/twitter-2010.txt" ]; then
+    echo "File $real_world_folder/twitter-2010.txt already exists."
+else
+    download_and_extract https://snap.stanford.edu/data/twitter-2010.txt.gz $real_world_folder/
+fi
+python ./aby3-GORAM/privGraphQuery/preprocessing.py --target twitter
 
-# # parallel processing.
-# mpi_task=16
-# python ./GORAM/mpi_data_organization.py --target twitter --MPI_TASK $mpi_task --origional_folder $real_world_folder/ --mpi_folder $real_world_folder/realworld_mpi/
-# python ./GORAM/real_world_graph_analysis.py --target twitter --MPI true --MPI_TASK $mpi_task --data_folder $MAIN_FOLDER/realworld_mpi/
+# parallel processing.
+mpi_task=16
+python ./GORAM/mpi_data_organization.py --target twitter --MPI_TASK $mpi_task --origional_folder $real_world_folder/ --mpi_folder $real_world_folder/realworld_mpi/
+python ./GORAM/real_world_graph_analysis.py --target twitter --MPI true --MPI_TASK $mpi_task --data_folder $MAIN_FOLDER/realworld_mpi/
