@@ -35,31 +35,34 @@ else
     echo "Directory $record_folder already exists."
 fi
 
-echo -e "\e[32mSlashdot\e[0m"
+# echo -e "\e[32mSlashdot\e[0m"
 
-# data prepare
-if [ -f "$real_world_folder/soc-Slashdot0902.txt" ]; then
-    echo "File $real_world_folder/soc-Slashdot0902.txt already exists."
-else
-    download_and_extract https://snap.stanford.edu/data/soc-Slashdot0902.txt.gz $real_world_folder/
-fi
-python ./aby3-GORAM/privGraphQuery/preprocessing.py --target slashdot
-python ./GORAM/real_world_graph_analysis.py --target slashdot;
+# # data prepare
+# if [ -f "$real_world_folder/soc-Slashdot0902.txt" ]; then
+#     echo "File $real_world_folder/soc-Slashdot0902.txt already exists."
+# else
+#     download_and_extract https://snap.stanford.edu/data/soc-Slashdot0902.txt.gz $real_world_folder/
+# fi
+# # python ./aby3-GORAM/privGraphQuery/preprocessing.py --target slashdot
+# for i in {1..5}; do
+#     python ./GORAM/real_world_graph_analysis.py --target slashdot;
+# done
 
-echo -e "\e[32mDBLP\e[0m"
+# echo -e "\e[32mDBLP\e[0m"
 
-if [ -f "$real_world_folder/com-dblp.all.cmty.txt" ]; then
-    echo "File $real_world_folder/com-dblp.all.cmty.txt already exists."
-else
-    download_and_extract https://snap.stanford.edu/data/bigdata/communities/com-dblp.all.cmty.txt.gz $real_world_folder/
-fi
-python ./aby3-GORAM/privGraphQuery/preprocessing.py --target dblp
-python ./GORAM/real_world_graph_analysis.py --target dblp;
+# if [ -f "$real_world_folder/com-dblp.all.cmty.txt" ]; then
+#     echo "File $real_world_folder/com-dblp.all.cmty.txt already exists."
+# else
+#     download_and_extract https://snap.stanford.edu/data/bigdata/communities/com-dblp.all.cmty.txt.gz $real_world_folder/
+# fi
+# # python ./aby3-GORAM/privGraphQuery/preprocessing.py --target dblp
+# for i in {1..5}; do
+#     python ./GORAM/real_world_graph_analysis.py --target dblp;
+# done
+# cp -r ./aby3-GORAM/record/real_world/* $record_folder/
+# # cd ../;
 
-cp -r ./aby3-GORAM/record/real_world/* $record_folder/
-cd ../;
-
-# large scale, requiring >3 * 400GB RAM, therefore we do not provide a full version here, the following code is for reference only.
+# # large scale, requiring >3 * 400GB RAM, therefore we do not provide a full version here, the following code is for reference only.
 echo -e "\e[32mTwitter (it will take a long time...), therefore we comment out the corresponding scripts\e[0m"
 
 if [ -f "$real_world_folder/twitter-2010.txt" ]; then
@@ -67,9 +70,9 @@ if [ -f "$real_world_folder/twitter-2010.txt" ]; then
 else
     download_and_extract https://snap.stanford.edu/data/twitter-2010.txt.gz $real_world_folder/
 fi
-python ./aby3-GORAM/privGraphQuery/preprocessing.py --target twitter
+# python ./aby3-GORAM/privGraphQuery/preprocessing.py --target twitter
 
-# parallel processing.
+# # parallel processing.
 mpi_task=16
-python ./GORAM/mpi_data_organization.py --target twitter --MPI_TASK $mpi_task --origional_folder $real_world_folder/ --mpi_folder $real_world_folder/realworld_mpi/
-python ./GORAM/real_world_graph_analysis.py --target twitter --MPI true --MPI_TASK $mpi_task --data_folder $MAIN_FOLDER/realworld_mpi/
+# python ./GORAM/mpi_data_organization.py --target twitter --MPI_TASK $mpi_task --origional_folder $real_world_folder/ --mpi_folder $real_world_folder/realworld_mpi/
+python ./GORAM/real_world_graph_analysis.py --target twitter --MPI true --MPI_TASK $mpi_task --data_folder $real_world_folder/realworld_mpi/
