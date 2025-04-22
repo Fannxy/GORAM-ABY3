@@ -74,15 +74,52 @@ meta_file="twitter_meta.txt"
 
 
 # generate the random shares.
-echo -e "\e[32mGenerate the random shares\e[0m"
+# echo -e "\e[32mGenerate the random shares\e[0m"
+# unit_l=148735
+# bar_l=8
+# b=64
+# joint_n_list=(8)
+# for N in ${joint_n_list[@]}; do
+#     (
+#         echo "N: $N"
+#         save_folder="/root/GORAM-ABY3/aby3/aby3-GORAM/data/real_world/share_data_parallel/"
+
+#         if [ ! -d $save_folder ]; then
+#             echo "Creating folder $save_folder"
+#             mkdir -p $save_folder
+#         fi
+
+#         echo "Data folder: $save_folder"
+
+#         total_length=$((bar_l * b * b * 2 * 2))
+#         N_plus=$(( (unit_l / bar_l) * N ))
+
+#         # for i in $(seq 0 $((N_plus - 1))); do
+#         # (
+#         #     data_file_path="${save_folder}/provider_${i}.txt"
+#         #     meta_file_path="${save_folder}/provider_${i}_meta.txt"
+#         #     ./out/build/linux/frontend/frontend -getShare True -data_file_path ${data_file_path} -meta_file_path ${meta_file_path} -total_length ${total_length}
+#         # ) &
+#         # done
+#         # wait;
+
+#         seq 0 $((N_plus - 1)) | parallel -j 128 --progress --bar --joblog ./parallel.log -I{} ./out/build/linux/frontend/frontend -getShare True -data_file_path ${save_folder}/provider_{}.txt -meta_file_path ${save_folder}/provider_{}_meta.txt -total_length ${total_length}
+
+#         cat ./debug.txt
+#         rm ./debug.txt
+#     )
+# done
+# wait;
+
+# benchmark transmission!
 unit_l=148735
 bar_l=8
 b=64
-joint_n_list=(2 4 8)
+joint_n_list=(8)
 for N in ${joint_n_list[@]}; do
     (
         echo "N: $N"
-        save_folder="/root/GORAM-ABY3/aby3/aby3-GORAM/data/real_world/share_data_${N}/"
+        data_folder="/root/GORAM-ABY3/aby3/aby3-GORAM/data/real_world/share_data_parallel/"
 
         if [ ! -d $save_folder ]; then
             echo "Creating folder $save_folder"
@@ -91,20 +128,56 @@ for N in ${joint_n_list[@]}; do
 
         echo "Data folder: $save_folder"
 
-        total_length=$((bar_l * b * b * 2 * 2))
+        # total_length=$((bar_l * b * b * 2 * 2))
         N_plus=$(( (unit_l / bar_l) * N ))
+        # N_plus=16
 
-        for i in $(seq 0 $((N_plus - 1))); do
-        (
-            data_file_path="${save_folder}/provider_${i}.txt"
-            meta_file_path="${save_folder}/provider_${i}_meta.txt"
-            ./out/build/linux/frontend/frontend -getShare True -data_file_path ${data_file_path} -meta_file_path ${meta_file_path} -total_length ${total_length}
-        ) &
+        parallel_size=1024
+        N_times=$((N_plus / parallel_size))
+        for i in $(seq 0 $((N_times - 1))); do
+            (
+                # start server.
+                ./out/build/linux/frontend/frontend -transfer True -role 0 -N $parallel_size -provider_id -1 -server_ip "127.0.0.1" -data_folder "/root/GORAM-ABY3/aby3/aby3-GORAM/data/real_world/share_data_parallel/" -data_file_path "tmp" -meta_file_path "meta" -n_plus ${N_plus} &
+
+                for j in $(seq 0 $((parallel_size - 1))); do
+                (
+                    provider_id=$((i * parallel_size + j))
+                    data_file_path="provider_${provider_id}.txt"
+                    meta_file_path="provider_${provider_id}_meta.txt"
+                    record_folder="/root/GORAM-ABY3/aby3/aby3-GORAM/record/deployment/"
+                    if [ ! -d $record_folder ]; then
+                        echo "Creating folder $record_folder"
+                        mkdir -p $record_folder
+                    fi
+                    record_file_path="trans_provider_${provider_id}_${N}.txt"
+                    echo "provider id is $provider_id" >> ${record_folder}${record_file_path}
+
+                    # start server.
+                    ./out/build/linux/frontend/frontend -transfer True -role 1 -N $parallel_size -provider_id $j -data_folder $data_folder -data_file_path $data_file_path -meta_file_path $meta_file_path 
+                    -n_plus ${N_plus};
+                ) &
+                done
+                wait;
+            )
         done
-        wait;
+
+        # start server.
+        # ./out/build/linux/frontend/frontend -role 0 -N $data_folder -file_path $file_path -meta_file_path $meta_file_path -record_folder $record_folder -record_file $record_file_path;
+
+        # for i in $(seq 0 $((N_plus - 1))); do
+        # (
+        #     data_file_path="${save_folder}/provider_${i}.txt"
+        #     meta_file_path="${save_folder}/provider_${i}_meta.txt"
+        #     ./out/build/linux/frontend/frontend -getShare True -data_file_path ${data_file_path} -meta_file_path ${meta_file_path} -total_length ${total_length}
+        # ) &
+        # done
+        # wait;
+
+        # seq 0 $((N_plus - 1)) | parallel -j 128 --progress --bar --joblog ./parallel.log -I{} ./out/build/linux/frontend/frontend -getShare True -data_file_path ${save_folder}/provider_{}.txt -meta_file_path ${save_folder}/provider_{}_meta.txt -total_length ${total_length}
 
         cat ./debug.txt
         rm ./debug.txt
     )
 done
 wait;
+
