@@ -81,43 +81,43 @@ meta_file="twitter_meta.txt"
 # done
 
 
-# generate the random shares.
-# echo -e "\e[32mGenerate the random shares\e[0m"
-# unit_l=148735
-# bar_l=8
-# b=64
-# joint_n_list=(8)
-# for N in ${joint_n_list[@]}; do
-#     (
-#         echo "N: $N"
-#         save_folder="/root/GORAM-ABY3/aby3/aby3-GORAM/data/real_world/share_data_parallel/"
+generate the random shares.
+echo -e "\e[32mGenerate the random shares\e[0m"
+unit_l=148735
+bar_l=1024
+b=64
+joint_n_list=(8)
+for N in ${joint_n_list[@]}; do
+    (
+        echo "N: $N"
+        save_folder="/root/GORAM-ABY3/aby3/aby3-GORAM/data/real_world/share_data_parallel/"
 
-#         if [ ! -d $save_folder ]; then
-#             echo "Creating folder $save_folder"
-#             mkdir -p $save_folder
-#         fi
+        if [ ! -d $save_folder ]; then
+            echo "Creating folder $save_folder"
+            mkdir -p $save_folder
+        fi
 
-#         echo "Data folder: $save_folder"
+        echo "Data folder: $save_folder"
 
-#         total_length=$((bar_l * b * b * 2 * 2))
-#         N_plus=$(( (unit_l / bar_l) * N ))
+        total_length=$((bar_l * b * b * 2 * 2))
+        N_plus=$(( (unit_l / bar_l) * N ))
 
-#         # for i in $(seq 0 $((N_plus - 1))); do
-#         # (
-#         #     data_file_path="${save_folder}/provider_${i}.txt"
-#         #     meta_file_path="${save_folder}/provider_${i}_meta.txt"
-#         #     ./out/build/linux/frontend/frontend -getShare True -data_file_path ${data_file_path} -meta_file_path ${meta_file_path} -total_length ${total_length}
-#         # ) &
-#         # done
-#         # wait;
+        # for i in $(seq 0 $((N_plus - 1))); do
+        # (
+        #     data_file_path="${save_folder}/provider_${i}.txt"
+        #     meta_file_path="${save_folder}/provider_${i}_meta.txt"
+        #     ./out/build/linux/frontend/frontend -getShare True -data_file_path ${data_file_path} -meta_file_path ${meta_file_path} -total_length ${total_length}
+        # ) &
+        # done
+        # wait;
 
-#         seq 0 $((N_plus - 1)) | parallel -j 128 --progress --bar --joblog ./parallel.log -I{} ./out/build/linux/frontend/frontend -getShare True -data_file_path ${save_folder}/provider_{}.txt -meta_file_path ${save_folder}/provider_{}_meta.txt -total_length ${total_length}
+        seq 0 $((N_plus - 1)) | parallel -j 128 --progress --bar --joblog ./parallel.log -I{} ./out/build/linux/frontend/frontend -getShare True -data_file_path ${save_folder}/provider_{}.txt -meta_file_path ${save_folder}/provider_{}_meta.txt -total_length ${total_length}
 
-#         cat ./debug.txt
-#         rm ./debug.txt
-#     )
-# done
-# wait;
+        cat ./debug.txt
+        rm ./debug.txt
+    )
+done
+wait;
 
 # benchmark transmission!
 unit_l=148735
