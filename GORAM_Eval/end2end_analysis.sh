@@ -26,6 +26,14 @@ cd ./aby3/;
 cp ./frontend/main.e2e ./frontend/main.cpp;
 python build.py
 
+
+MAIN_FOLDER=/root/GORAM-ABY3/aby3/
+
+# THE FOLLOWING IS FOR DISTRIBUTED TEST
+scp ${MAIN_FOLDER}out/build/linux/frontend/frontend aby31:${MAIN_FOLDER}out/build/linux/frontend/ &
+scp ${MAIN_FOLDER}out/build/linux/frontend/frontend aby32:${MAIN_FOLDER}out/build/linux/frontend/ &
+wait;
+
 # data prepare
 echo -e "\e[32mTwitter\e[0m"
 
@@ -115,7 +123,7 @@ meta_file="twitter_meta.txt"
 unit_l=148735
 bar_l=8
 b=64
-joint_n_list=(8)
+joint_n_list=(2 4 8)
 for N in ${joint_n_list[@]}; do
     (
         echo "N: $N"
@@ -132,12 +140,12 @@ for N in ${joint_n_list[@]}; do
         N_plus=$(( (unit_l / bar_l) * N ))
         # N_plus=16
 
-        parallel_size=1024
+        parallel_size=256
         N_times=$((N_plus / parallel_size))
         for i in $(seq 0 $((N_times - 1))); do
             (
                 # start server.
-                ./out/build/linux/frontend/frontend -transfer True -role 0 -N $parallel_size -provider_id -1 -server_ip "127.0.0.1" -data_folder "/root/GORAM-ABY3/aby3/aby3-GORAM/data/real_world/share_data_parallel/" -data_file_path "tmp" -meta_file_path "meta" -n_plus ${N_plus} &
+                ssh aby31 "ulimit -n 65536; cd ${MAIN_FOLDER}; ./out/build/linux/frontend/frontend -transfer True -role 0 -N ${parallel_size} -provider_id -1 -server_ip \"10.5.0.41\" -data_folder \"/root/GORAM-ABY3/aby3/aby3-GORAM/data/real_world/share_data_parallel/\" -data_file_path \"tmp\" -meta_file_path \"meta\" -n_plus ${N_plus}" &
 
                 for j in $(seq 0 $((parallel_size - 1))); do
                 (
@@ -149,12 +157,9 @@ for N in ${joint_n_list[@]}; do
                         echo "Creating folder $record_folder"
                         mkdir -p $record_folder
                     fi
-                    record_file_path="trans_provider_${provider_id}_${N}.txt"
-                    echo "provider id is $provider_id" >> ${record_folder}${record_file_path}
 
-                    # start server.
-                    ./out/build/linux/frontend/frontend -transfer True -role 1 -N $parallel_size -provider_id $j -data_folder $data_folder -data_file_path $data_file_path -meta_file_path $meta_file_path 
-                    -n_plus ${N_plus};
+                    # start provider.
+                    ./out/build/linux/frontend/frontend -transfer True -role 1 -N $parallel_size -provider_id $j -server_ip "10.5.0.41" -data_folder $data_folder -data_file_path $data_file_path -meta_file_path $meta_file_path -n_plus ${N_plus};
                 ) &
                 done
                 wait;
